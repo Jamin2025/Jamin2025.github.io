@@ -1,0 +1,7 @@
+@import 'tailwindcss';
+@import '@strum/colors/tailwind.css';
+@config './colors-config.ts';
+@import './theme';
+@import './base';
+@import './variants';
+@import './utilities';
