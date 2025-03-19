@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, Suspense } from 'react';
 import AboutMe from 'src/components/articles/about-me';
 import Achievements from 'src/components/articles/achievements';
 import AdditionalInfo from 'src/components/articles/additional-info';
@@ -14,7 +14,9 @@ export default function Page(): ReactNode {
         <ContactInformation />
         <Skills />
       </div>
-      <HashModal />
+      <Suspense>
+        <HashModal />
+      </Suspense>
       <Professional />
       <Achievements />
       <AdditionalInfo />

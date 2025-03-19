@@ -139,17 +139,6 @@ export const AdditionalInfo = defineDocumentType(() => ({
   },
 }));
 
-export const PrivateField = defineDocumentType(() => ({
-  name: 'PrivateField',
-  filePathPattern: 'private-fields/*.md',
-  fields: {
-    label: {
-      type: 'string',
-      description: 'A label to describe the private field',
-      required: true,
-    },
-  },
-}));
 
 export default makeSource({
   contentDirPath: 'edit-me/content',
@@ -159,6 +148,5 @@ export default makeSource({
     ProfessionalExperience,
     Achievement,
     AdditionalInfo,
-    PrivateField,
   ],
 });

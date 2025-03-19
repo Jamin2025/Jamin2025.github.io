@@ -1,15 +1,16 @@
-import { PrivateField, personal } from '@content';
+import { personal } from '@content';
+// import { PrivateField, personal } from '@content';
 import { IdentificationIcon } from '@heroicons/react/24/solid';
 import { ReactNode } from 'react';
 import SectionHeading from 'src/components/section-heading/section-heading';
 
-interface ContactInformationProperties {
-  privateInformation?: PrivateField[];
-}
+// interface ContactInformationProperties {
+//   privateInformation?: PrivateField[];
+// }
 
 export default function ContactInformation({
   privateInformation,
-}: ContactInformationProperties): ReactNode {
+}: any): ReactNode {
   return (
     <article className="space-y-4">
       <SectionHeading
@@ -28,12 +29,12 @@ export default function ContactInformation({
         </li>
 
         {/* private access required */}
-        {privateInformation?.map((privateField) => (
+        {/* {privateInformation?.map((privateField) => (
           <li className="mt-3" key={privateField.label}>
             <strong>{privateField.label}</strong>{' '}
             <div dangerouslySetInnerHTML={{ __html: privateField.body.html }} />
           </li>
-        ))}
+        ))} */}
       </ul>
     </article>
   );

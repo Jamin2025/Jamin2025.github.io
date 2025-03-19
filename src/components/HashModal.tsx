@@ -8,12 +8,14 @@ import TwoPhaseTMRDashboard from './alg/components/TwoPhaseTMR';
 
 const HashModal = () => {
   const searchParams = useSearchParams()
-  const router = useRouter();
   const search = searchParams.get('modal')
+  const router = useRouter();
+  
   const [showModal, setShowModal] = useState(false);
 
   // 监听路由变化
   useEffect(() => {
+    
     if (search === "alg") {
       document.body.style.overflow = "hidden"
     } else {

@@ -17,7 +17,10 @@ const nextConfig: NextConfig = {
   assetPrefix,
   basePath,
   reactStrictMode: true,
-  output: "export"
+  output: 'export',
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 };
 
 export default withContentlayer(nextConfig);

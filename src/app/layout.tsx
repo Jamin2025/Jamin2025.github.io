@@ -2,7 +2,7 @@ import { personal } from '@content';
 import { Metadata, Viewport } from 'next';
 import { ThemeProvider } from 'next-themes';
 import { Albert_Sans, JetBrains_Mono } from 'next/font/google';
-import { headers } from 'next/headers';
+// import { headers } from 'next/headers';
 import { PropsWithChildren, ReactNode } from 'react';
 import Footer from 'src/components/footer/footer';
 import Header from 'src/components/header/header';
@@ -23,9 +23,10 @@ const jetBrainsMono = JetBrains_Mono({
 });
 
 export const generateMetadata = async (): Promise<Metadata> => {
-  const requestHeaders = await headers();
-  const host = requestHeaders.get('host');
-  const baseURL = `${protocol}://${host ?? deployURL ?? ''}`;
+  // const requestHeaders = await headers();
+  // const host = requestHeaders.get('host');
+  // const baseURL = `${protocol}://${host ?? deployURL ?? ''}`;
+  const baseURL = ""
   const siteName = `${fullName} Professional Résumé`;
   const title = `Résumé | ${fullName}`;
   const description = `Professional résumé for ${fullName}.`;
@@ -37,7 +38,7 @@ export const generateMetadata = async (): Promise<Metadata> => {
     description,
     generator: 'Next.js',
     keywords: ['resume', fullName, 'next.js', 'pdf'],
-    metadataBase: new URL(baseURL),
+    // metadataBase: "",
     openGraph: {
       type: 'profile',
       firstName: personal.givenName,

@@ -41,6 +41,7 @@
     "eslint-plugin-react": "7.37.4",
     "eslint-plugin-react-hooks": "5.2.0",
     "eslint-plugin-unicorn": "57.0.0",
+    "gh-pages": "^6.3.0",
     "jsdom": "26.0.0",
     "postcss": "8.5.3",
     "prettier": "3.5.3",
@@ -51,7 +52,7 @@
     "typescript": "5.8.2",
     "typescript-eslint": "8.26.1"
   },
-  "homepage": "https://github.com/colinhemphill/nextjs-resume",
+  "homepage": "https://jamin2025.github.io",
   "keywords": [
     "generator",
     "nextjs",
@@ -61,8 +62,10 @@
   ],
   "license": "MIT",
   "scripts": {
-    "build": "next build && next export",
+    "build": "next build",
     "build:content": "contentlayer2 build",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d out",
     "dev": "next dev",
     "format": "prettier --write 'src/**/*.{json,js,ts,tsx}' && syncpack format",
     "lint": "next lint --fix && syncpack format && syncpack lint",
