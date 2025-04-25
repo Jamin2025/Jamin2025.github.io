@@ -13,7 +13,9 @@ titles:
   #   description: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ultrices in iaculis nunc sed augue lacus viverra vitae congue.
 ---
 编写了 [inject-modal](https://segmentfault.com/a/1190000022512957) 模态框注入组件，减少代码耦合程度
-- 负责公司内部 OA 系统的研发，基于 UMI，使用了 React-Hooks。
-- 逐步推动小组使用 TypeScript 开发项目。 
+- 负责公司内部 OA 系统的研发，基于 UMI，使用了 React-Hooks。 
 - 编写逻辑复杂表格组件，并使用虚拟列表减少 Dom 过量渲染，动态规划减少重复计算。
-- 参与 Code Review 与代码规范制定。
+- 逐步推动小组使用 TypeScript 开发项目。参与 Code Review 与代码规范制定。
+- 通过微程序实现大规模应用的解耦。
+- 借助 Tree-Shaking 移除无用代码，优化上线体积。
+- 编写一个基于 Node.js 的脚本工具，用于自动化数据处理并生成可视化展示。
