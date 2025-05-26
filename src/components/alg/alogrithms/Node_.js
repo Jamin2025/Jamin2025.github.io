@@ -13,7 +13,7 @@ class Node {
         const { cores } = this
         this.NodeID = id
         for (let i = 0; i < coreNums; i++) {
-            cores[i] = new Core(i, mode, id)
+            cores[i] = new Core(i, mode, this.NodeID)
         }
         
     }
@@ -71,7 +71,7 @@ class Node {
             if (a == b) return [a, cores[2]];
             if (a == c) return [c, cores[1]];
             if (b == c) return [b, cores[0]];
-            console.log('TMR_with_fault_core error Majority Voting can\'nt determine the result', a, b, c)
+            // console.log('TMR_with_fault_core error Majority Voting can\'nt determine the result', a, b, c)
             return [0, cores];
         },
     
@@ -79,7 +79,7 @@ class Node {
             if (a == b) return a;
             if (a == c) return c;
             if (b == c) return b;
-            console.log('TMR error Majority Voting can\'nt determine the result', a, b, c)
+            // console.log('TMR error Majority Voting can\'t determine the result', a, b, c)
             return 0;
         },
     

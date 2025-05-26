@@ -10,13 +10,12 @@ const getRandomCpuState = (): string => {
 interface MachineProps { 
   machineId: number,
   coreState?: string[],
-  storageState?: string[],
   coresDisabled?: boolean[]
   isLeader?: boolean
   leaderCore?: number[]
 }
 
-const Machine = ({ machineId, coreState, storageState, coresDisabled, isLeader, leaderCore }: MachineProps) => {
+const Machine = ({ machineId, coreState, coresDisabled, isLeader, leaderCore }: MachineProps) => {
     return (
       <MachineContainer bordercolor={isLeader ? '#87CEEB' : "#ddd"}>
         <h3>Node {machineId + 1}</h3>
