@@ -17,47 +17,32 @@ class Node {
         }
         
     }
+    // 空闲内核优先调度
     async runOnDistinctFreeCores(num, exclude, task) {
         let i = 0
         const hasExclude = exclude instanceof Set
-        if (hasExclude && exclude.size === 4) throw new Error("runOnDistinctFreeCores error");
+        if (hasExclude && exclude.size === 4) return Promise.reject("runOnDistinctFreeCores error");
         if (hasExclude && coreNums - exclude.size < num) return Promise.reject("no more distinct core")
-        const freeCoresAndCalArr = await new Promise(async (resolve, reject) => {
+        const freeCoresAndCalArr = await new Promise(async (resolve) => {
             let freeCores = []
-            let callArr = []
-            const searchs = []
-            for (let j = 0; j < 4; j++) {
-                // 排除掉的内核
-                if (hasExclude && exclude.has(j)) continue
-                searchs.push(this.cores[j].curCalculate.then(() => {
-                    if (i < num) {
-                        ++i
-                        callArr.push(this.cores[j].calculate(task))
-                        freeCores.push(j)
-                        if (i === num) resolve({ freeCores, callArr })
-                    }
-                    return null
-                })
-            )
+            const callArr = []
+            // 注册
+            const filterCores = hasExclude ? this.cores.filter((item) => !exclude.has(item.id)) : [...this.cores];
+            // 最空闲内核优先调度
+            filterCores.sort((a, b) => a.scheduleQueue.length - b.scheduleQueue.length);
+            for (let i = 0; i < num; i++) {
+                const core = filterCores[i]
+                freeCores.push(core.id);
+                callArr.push(core.calculate(task))
             }
-            Promise.all(searchs).then(() => {
-                if (i < num) reject("no more distinct core")
-            })
+            resolve({ freeCores, callArr })
         })
-        return freeCoresAndCalArr
+        return freeCoresAndCalArr;
     }
-
+    // 空闲内核优先调度
     async executeTask(task) {
-        return new Promise((resolve) => {
-            let isCalculated = false
-            for (let i = 0; i < 4; i++) {
-                this.cores[i].curCalculate.then(() => {
-                    if (isCalculated) return null
-                    isCalculated = true
-                    resolve([this.cores[i].calculate(task), i])
-                })
-            }
-        })
+        const core = [...this.cores].sort((a, b) => a.scheduleQueue.length - b.scheduleQueue.length)[0]
+        return [core.calculate(task)];
     }
 
     getTaskRunCount() {

@@ -130,7 +130,7 @@ class NodeReactiveTMR extends Node_ {
                 const brokenCore = brokenCores[i]
                 // 判断该轮次是否需要比较
                 if (!this.checkIfCompareRound(taskID, brokenCore, round)) return
-                const tryRes = await this.cores[brokenCore].curCalculate.then(() => this.cores[brokenCore].calculate(task))
+                const tryRes = await this.cores[brokenCore].calculate(task)
                 setExperimentStateForReactiveTMR((prevState) => {
                     const newState = [...prevState]
                     newState[1] += 1
@@ -180,18 +180,13 @@ class NodeReactiveTMR extends Node_ {
     }
 
     async runWithOutBrokenCore(task) {
-        if (this.brokenCores.size === coreNums) throw new Error("no more regular cores to used");
+        if (this.brokenCores.size === 4) throw new Error("no more regular cores to used");
         return new Promise((resolve) => {
-            let isCalculated = false
-            for (let i = 0; i < 4; i++) {
-                if (!this.brokenCores.has(i)) {   
-                    this.cores[i].curCalculate.then(() => {
-                        if (isCalculated) return null
-                        isCalculated = true
-                        resolve([this.cores[i].calculate(task), i])
-                    })
-                }
-            }
+            // 注册
+            const filterCores = this.cores.filter((item) => !this.brokenCores.has(item.id));
+            // 最空闲内核优先调度
+            filterCores.sort((a, b) => a.scheduleQueue.length - b.scheduleQueue.length);
+            resolve([filterCores[0].calculate(task), filterCores[0].id])
         })
     }
 

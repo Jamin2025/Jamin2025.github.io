@@ -22,6 +22,8 @@ class Core {
     id = null
     mode = null
     active_ = true
+    scheduleQueue = []
+
     constructor(id, mode, NodeID) {
         this.id = id
         this.mode = mode
@@ -36,11 +38,7 @@ class Core {
         this.active_ = true
     }
 
-    curCalculate = Promise.resolve();
-
-    calculate(task) {
-        this.calCount++;
-        if (this.isCalculate) return this.curCalculate.then(() => this.calculate(task));
+    promiseCalculate(task) {
         this.isCalculate = true;
         const isTMR = this.mode === 0
         const isTwoPhaseTMR = this.mode === 1
@@ -53,7 +51,7 @@ class Core {
             if (!this.active_) console.info("try reactive")
         }
         else if (isCluterTMR) coreToBusyForClusterTMR(this.id, this.NodeID)
-        this.curCalculate = new Promise((resolve) => {
+        return new Promise((resolve) => {
             setTimeout(() => {
                 if (this.isNormalOperate() && !hitProbability(task.transientFaultProbality)) task.result = 0.5
                 else task.result = Math.random()
@@ -65,7 +63,27 @@ class Core {
                 resolve(task.result)
             }, task.duration * 1000)
         })
-        return this.curCalculate
+    }
+
+    auxCalculate() {
+        if (this.scheduleQueue.length) {
+            const task = this.scheduleQueue[0];
+            return task().then(() => {
+                this.scheduleQueue.shift();
+                this.auxCalculate();
+            })
+        }
+    }
+
+    calculate(task) {
+        this.calCount++;
+        return new Promise((resolve) => {
+            this.scheduleQueue.push(() => this.promiseCalculate(task).then(resolve))
+            if (this.scheduleQueue.length === 1) this.auxCalculate()
+        })
+        
+        // 这里存在bug，应该从队列里调用，而不是这样，有调度bug
+        // 调度完了结果怎么返回回去呢？
     }
 
     isCalculating() {

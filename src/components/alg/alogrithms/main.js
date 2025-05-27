@@ -43,10 +43,10 @@ export async function ReactiveTMR(AppBeTest, isRandomData, setRTMRexcutedNumsCom
                 res.push(node.runWithReactiveTMR(AppBeTest, (taskNum, excutedTaskNum, taskRes) => {
                     taskNums += taskNum;
                     excutedNums += excutedTaskNum;
-                    if (taskRes !== 0.5) failedNums += 1;
-                    const pof = (failedNums / taskNums).toFixed(4)
                     newExcutedNumsComp.push([taskNums, excutedNums, 'R-TMR'])
                     if (taskNum !== 0) {
+                        if (taskRes !== 0.5) failedNums += 1;
+                        const pof = (failedNums / taskNums).toFixed(4)
                         newExcutedPofComp.push([taskNums, pof, 'R-TMR'])
                         setRTMRexcutedPofComp([...newExcutedPofComp])
                     }

@@ -3,10 +3,12 @@ import {useRef, useEffect, useLayoutEffect} from "react"
 import {Graph} from "../alogrithms/util/graphType"
 import * as echarts from "echarts"
 function computeLevels(nodes: any, edges: any) {
+    /*@ts-ignore */
     const inDegree = new Map(nodes.map(n => [n.id, 0]));
     const graph = new Map();
 
     for (const { source, target } of edges) {
+      /*@ts-ignore */
       inDegree.set(target, inDegree.get(target) + 1);
       if (!graph.has(source)) graph.set(source, []);
       graph.get(source).push(target);
@@ -20,9 +22,11 @@ function computeLevels(nodes: any, edges: any) {
     }
 
     while (queue.length > 0) {
+      /*@ts-ignore */
       const { id, level } = queue.shift();
       levelMap.set(id, level);
       for (const neighbor of graph.get(id) || []) {
+        /*@ts-ignore */
         inDegree.set(neighbor, inDegree.get(neighbor) - 1);
         if (inDegree.get(neighbor) === 0) {
           queue.push({ id: neighbor, level: level + 1 });
@@ -46,6 +50,7 @@ function computeLevels(nodes: any, edges: any) {
 
     for (const [levelStr, nodeIds] of Object.entries(levels)) {
       const level = parseInt(levelStr);
+      /*@ts-ignore */
       nodeIds.forEach((id, index) => {
         positioned.push({
           name: nodes[id].name,
@@ -64,6 +69,7 @@ const GraphVisiualization = ({graphData, amplife}: {graphData?: Graph, amplife?:
          // Initialize the echarts instance based on the prepared dom
         if (!graphData) return
         var myChart = echarts.init(graphRef.current);
+        /*@ts-ignore */
         const nodeList = graphData.map(item => ({name: `T${item.id}\n${item.duration}`, id: item.id}))
        
         const links = []
@@ -113,6 +119,7 @@ const GraphVisiualization = ({graphData, amplife}: {graphData?: Graph, amplife?:
         };
 
         // Display the chart using the configuration items and data just specified.
+        /*@ts-ignore */
         myChart.setOption(option);
     }, [graphData, amplife]);
     
