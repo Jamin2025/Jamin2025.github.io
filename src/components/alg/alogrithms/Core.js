@@ -1,33 +1,33 @@
 
 const { hitProbability } = require('./poisson.js')
-const { coreToBusyForTMR,
-        coreRestoreForTMR,
-        
-        coreToBusyForTwoPhaseTMR,
-        coreRestoreForTwoPhaseTMR,
-        
-        coreRestoreForReactiveTMR,
-        coreToBusyForReactiveTMR,
-        
-        coreToBusyForClusterTMR, 
-        coreRestoreForClusterTMR 
-    } = require('../util/index')
+const MaxHeap = require ("./util/heap.js").default
 const coreNums = 4
+
+function largerTaskOfDuration(a, b) {
+    return a.duration > b.duration
+}
 
 class Core {
     isPermentFault = false;
-    isCalculate = false;
+    isCalculating = false;
     calCount = 0
-    NodeID = null
     id = null
-    mode = null
+    scheduleMode = 'FCFS'
     active_ = true
     scheduleQueue = []
+    scheduleHeap = new MaxHeap(largerTaskOfDuration)
+    load = 0
 
-    constructor(id, mode, NodeID) {
-        this.id = id
-        this.mode = mode
-        this.NodeID = NodeID
+
+    constructor(coreID, startExec, endExec) {
+        this.id = coreID
+        let that = this
+        this.startExec = startExec
+        this.endExec = endExec
+    }
+    // FCFS or LTF longest task first
+    switchScheduleMode(mode) {
+        this.scheduleMode = mode;
     }
 
     deactiveCore () {
@@ -39,38 +39,39 @@ class Core {
     }
 
     promiseCalculate(task) {
-        this.isCalculate = true;
-        const isTMR = this.mode === 0
-        const isTwoPhaseTMR = this.mode === 1
-        const isReactiveTMR = this.mode === 2
-        const isCluterTMR = this.mode === 3
-        if (isTMR) coreToBusyForTMR(this.id, this.NodeID)
-        else if (isTwoPhaseTMR) coreToBusyForTwoPhaseTMR(this.id, this.NodeID)
-        else if (isReactiveTMR) {
-            coreToBusyForReactiveTMR(this.id, this.NodeID)
-            if (!this.active_) console.info("try reactive")
-        }
-        else if (isCluterTMR) coreToBusyForClusterTMR(this.id, this.NodeID)
+        this.isCalculating = true;
+        // 重写这里的代码，初始化的时候有两个钩子函数进行调用
+        if (typeof this.startExec === "function") this.startExec(this.id)
         return new Promise((resolve) => {
             setTimeout(() => {
                 if (this.isNormalOperate() && !hitProbability(task.transientFaultProbality)) task.result = 0.5
                 else task.result = Math.random()
-                this.isCalculate = false
-                if (isTMR) coreRestoreForTMR(this.id, this.isPermentFault, this.NodeID)
-                else if (isTwoPhaseTMR) coreRestoreForTwoPhaseTMR(this.id, this.isPermentFault, this.NodeID)
-                else if (isReactiveTMR) coreRestoreForReactiveTMR(this.id, this.isPermentFault, this.NodeID)
-                else if (isCluterTMR) coreRestoreForClusterTMR(this.id, this.isPermentFault, this.NodeID)
+                this.isCalculating = false
+                if (typeof this.endExec === "function") this.endExec(this.id, this.isPermentFault)
                 resolve(task.result)
-            }, task.duration * 1000)
+            }, 10)
+            // task.duration * 
         })
     }
 
-    auxCalculate() {
+    auxFCFSCalculate() {
         if (this.scheduleQueue.length) {
-            const task = this.scheduleQueue[0];
-            return task().then(() => {
-                this.scheduleQueue.shift();
-                this.auxCalculate();
+            const task = this.scheduleQueue.shift();
+            this.promiseCalculate(task).then((res) => {
+                this.load -= task.duration
+                this.auxFCFSCalculate();
+                task.resolve(res)
+            })
+        }
+    }
+
+    auxLTFCalculate() {
+        if (this.scheduleHeap.size) {
+            const task = this.scheduleHeap.extractMax()
+            this.promiseCalculate(task).then((res) => {
+                this.load -= task.duration
+                this.auxLTFCalculate();
+                task.resolve(res)
             })
         }
     }
@@ -78,16 +79,20 @@ class Core {
     calculate(task) {
         this.calCount++;
         return new Promise((resolve) => {
-            this.scheduleQueue.push(() => this.promiseCalculate(task).then(resolve))
-            if (this.scheduleQueue.length === 1) this.auxCalculate()
+            this.load += task.duration
+            task.resolve = resolve
+            if (this.scheduleMode === 'FCFS') {
+                this.scheduleQueue.push(task)
+                !this.isCalculating && this.auxFCFSCalculate()
+            } else {
+                this.scheduleHeap.insert(task)
+                !this.isCalculating && this.auxLTFCalculate()
+            }
         })
-        
-        // 这里存在bug，应该从队列里调用，而不是这样，有调度bug
-        // 调度完了结果怎么返回回去呢？
     }
 
     isCalculating() {
-        return this.isCalculate
+        return this.isCalculating
     }
     isNormalOperate() {
         return !this.isPermentFault
